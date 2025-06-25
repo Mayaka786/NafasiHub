@@ -1,11 +1,31 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 function LoginRegister() {
-  const [isActive, setIsActive] = useState(false); // State to toggle .active class
+  const [isActive, setIsActive] = useState(false); 
+  const [formValues, setFormValues] = useState({
+    username: '',
+    email: '',
+    mobile: '',
+    password: ''
+  }); 
 
-  // Toggle the .active class on click
+  
   const handleSwitch = () => {
     setIsActive(!isActive);
+  };
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Form submitted:', formValues);
+    // TODO: Add API call to backend (e.g., /api/register)
   };
 
   return (
@@ -15,33 +35,52 @@ function LoginRegister() {
     >
       {/* Register Form */}
       <div className="col-md-6 d-flex justify-content-center">
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="header-text mb-4">
             <h1>Create Account</h1>
           </div>
           <div className="input-group mb-3">
             <input
               type="text"
-              placeholder="Name"
+              placeholder="Username"
+              name="username"
               className="form-control form-control-lg bg-light fs-6"
+              value={formValues.username}
+              onChange={handleInputChange}
             />
           </div>
           <div className="input-group mb-3">
             <input
-              type="email"
+              type="email" 
               placeholder="Email"
+              name="email"
               className="form-control form-control-lg bg-light fs-6"
+              value={formValues.email}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="input-group mb-3">
+            <input
+              type="tel" 
+              name="mobile"
+              placeholder="Phone Number"
+              className="form-control form-control-lg bg-light fs-6"
+              value={formValues.mobile}
+              onChange={handleInputChange}
             />
           </div>
           <div className="input-group mb-3">
             <input
               type="password"
               placeholder="Password"
+              name="password"
               className="form-control form-control-lg bg-light fs-6"
+              value={formValues.password}
+              onChange={handleInputChange}
             />
           </div>
           <div className="input-group mb-3 justify-content-center">
-            <button className="btn border-white text-white w-50 fs-6">Register</button>
+            <button type="submit" className="btn border-white text-white w-50 fs-6">Register</button>
           </div>
         </form>
       </div>
@@ -74,11 +113,11 @@ function LoginRegister() {
               </label>
             </div>
             <div className="forgot">
-              <small><a href="#">Forgot Password?</a></small>
+              <small><Link to="/forgot-password">Forgot Password?</Link></small>
             </div>
           </div>
           <div className="input-group mb-3 justify-content-center">
-            <button className="btn border-white text-white w-50 fs-6">Login</button>
+            <button type="submit" className="btn border-white text-white w-50 fs-6">Login</button>
           </div>
         </form>
       </div>
