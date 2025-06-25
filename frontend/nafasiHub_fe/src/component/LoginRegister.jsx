@@ -1,31 +1,94 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function LoginRegister() {
-  const [isActive, setIsActive] = useState(false); 
+  const [isActive, setIsActive] = useState(false); // Toggle login/register slide
   const [formValues, setFormValues] = useState({
-    username: '',
-    email: '',
-    mobile: '',
-    password: ''
-  }); 
+    username: "",
+    email: "",
+    mobile: "",
+    password: "",
+  }); // Registration form state
+  const [loginValues, setLoginValues] = useState({
+    email: "",
+    password: "",
+  }); // Login form state
 
-  
+  const navigate = useNavigate();
+
+  // Toggle switch between login and register
   const handleSwitch = () => {
     setIsActive(!isActive);
   };
 
-  // Handle input changes
+  // Handle registration input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
+  // Handle login input changes
+  const handleLoginInputChange = (e) => {
+    const { name, value } = e.target;
+    setLoginValues({ ...loginValues, [name]: value });
+  };
+
+  // Handle registration form submission
+  const handleRegister = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', formValues);
-    // TODO: Add API call to backend (e.g., /api/register)
+    if (formValues.password.length < 6|| formValues.username.length < 3|| formValues.mobile.length < 10) {
+    toast.error("Invalid input fields", { position: "top-right" });
+    return;
+  }
+    try {
+      const response = await axios.post("http://localhost:3000/api/register", formValues, {
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log("Registered:", response.data);
+      // setIsActive(true); // Switch to login slide
+      navigate("/home");
+      toast.success("Registration successful! Please log in.", {
+        position: "top-right",
+        autoClose: 2000,
+        
+      });
+      // Reset form
+      setFormValues({ username: "", email: "", mobile: "", password: "" });
+    } catch (error) {
+      console.error("Registration failed:", error.response?.data || error.message);
+      toast.error("Registration failed: " + (error.response?.data?.error || "Server error"), {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  };
+
+  // Handle login form submission
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:3000/api/login", loginValues, {
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log("Logged in:", response.data);
+      toast.success("Login successful!", {
+        position: "top-center",
+        autoClose: 2000,
+      });
+      // Reset login form
+      setLoginValues({ email: "", password: "" });
+      // Redirect to home
+      navigate("/home");
+    } catch (error) {
+      console.error("Login failed:", error.response?.data || error.message);
+      toast.error("Login failed: " + (error.response?.data?.error || "Server error"), {
+        position: "top-center",
+        autoClose: 3000,
+      });
+    }
   };
 
   return (
@@ -33,9 +96,12 @@ function LoginRegister() {
       className={`content justify-content-center align-items-center d-flex shadow-lg ${isActive ? "active" : ""}`}
       id="content"
     >
+      {/* Toast Container */}
+      <ToastContainer />
+
       {/* Register Form */}
       <div className="col-md-6 d-flex justify-content-center">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleRegister}>
           <div className="header-text mb-4">
             <h1>Create Account</h1>
           </div>
@@ -51,7 +117,7 @@ function LoginRegister() {
           </div>
           <div className="input-group mb-3">
             <input
-              type="email" 
+              type="email"
               placeholder="Email"
               name="email"
               className="form-control form-control-lg bg-light fs-6"
@@ -61,9 +127,9 @@ function LoginRegister() {
           </div>
           <div className="input-group mb-3">
             <input
-              type="tel" 
+              type="tel"
               name="mobile"
-              placeholder="Phone Number"
+              placeholder="Mobile Number"
               className="form-control form-control-lg bg-light fs-6"
               value={formValues.mobile}
               onChange={handleInputChange}
@@ -87,7 +153,7 @@ function LoginRegister() {
 
       {/* Login Form */}
       <div className="col-md-6 right-box">
-        <form>
+        <form onSubmit={handleLogin}>
           <div className="header-text mb-4">
             <h1>Sign In</h1>
           </div>
@@ -95,14 +161,20 @@ function LoginRegister() {
             <input
               type="email"
               placeholder="Email"
+              name="email"
               className="form-control form-control-lg bg-light fs-6"
+              value={loginValues.email}
+              onChange={handleLoginInputChange}
             />
           </div>
           <div className="input-group mb-3">
             <input
               type="password"
               placeholder="Password"
+              name="password"
               className="form-control form-control-lg bg-light fs-6"
+              value={loginValues.password}
+              onChange={handleLoginInputChange}
             />
           </div>
           <div className="input-group mb-5 d-flex justify-content-between">

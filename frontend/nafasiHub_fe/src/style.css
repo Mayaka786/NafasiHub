@@ -7,6 +7,9 @@ body{
     flex-direction: column;
     height: 100vh;
 }
+.Toastify__toast--success {
+  background: #2C3E50;
+}
 .content{
     background-color: #fff;
      border-radius: 40px;
