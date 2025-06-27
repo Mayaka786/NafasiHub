@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function LoginRegister() {
-  const [isActive, setIsActive] = useState(false); // Toggle login/register slide
+  const [isActive, setIsActive] = useState(false);
   const [formValues, setFormValues] = useState({
     username: "",
     email: "",
@@ -40,7 +40,7 @@ function LoginRegister() {
   const handleRegister = async (e) => {
     e.preventDefault();
     if (formValues.password.length < 6|| formValues.username.length < 3|| formValues.mobile.length < 10) {
-    toast.error("Invalid input fields", { position: "top-right" });
+    toast.error(error, { position: "top-right" });
     return;
   }
     try {
@@ -48,19 +48,20 @@ function LoginRegister() {
         headers: { "Content-Type": "application/json" },
       });
       console.log("Registered:", response.data);
-      // setIsActive(true); // Switch to login slide
-      navigate("/home");
+      setIsActive(true); // Switch to login slide
       toast.success("Registration successful! Please log in.", {
-        position: "top-right",
-        autoClose: 2000,
+        position: "top-center",
+        autoClose: 3000,
         
       });
       // Reset form
       setFormValues({ username: "", email: "", mobile: "", password: "" });
+      navigate("/home");
+
     } catch (error) {
       console.error("Registration failed:", error.response?.data || error.message);
       toast.error("Registration failed: " + (error.response?.data?.error || "Server error"), {
-        position: "top-right",
+        position: "top-center",
         autoClose: 3000,
       });
     }
